@@ -9,7 +9,7 @@ CASE neighbours
   WHEN 3 THEN TRUE
   ELSE FALSE
 END 
-RETURN collect(c.alive) as alive, collect(c.id) as id""",
+RETURN collect({c.alive=TRUE}) as alive, collect(c.id) as id""",
     database_="neo4j",
 )
 
