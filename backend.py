@@ -7,7 +7,7 @@ import json
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 @app.route("/")
-def hello_world():
+def get_alive_cells():
     records, summary, keys = driver.execute_query(
     
     """MATCH (c)-[:NEIGHBOUR]->(q{alive:TRUE})
@@ -20,18 +20,10 @@ def hello_world():
         ELSE FALSE
         END 
     }
-    with c
     MATCH (c)   
     WHERE c.alive = TRUE
     RETURN collect(c.id) as alive
     """,
         database_="neo4j",
     )
-    lst = []
-    lst+=records
-    print("record",records[0].data()['alive'],type(records))
-
-    # for record in records:
-    #     #lst+=record.data()['']
-    #     print(record.data()['alive'])
-    return lst
+    return records[0].data()['alive']
