@@ -12,25 +12,26 @@ def hello_world():
     
     """MATCH (c)-[:NEIGHBOUR]->(q{alive:TRUE})
     with c, size(collect(q)) as neighbours
+    CALL (*) {
     SET c.alive = 
-    CASE neighbours
-    WHEN 2 THEN TRUE
-    WHEN 3 THEN TRUE
-    ELSE FALSE
-    END 
+        CASE neighbours
+        WHEN 2 THEN TRUE
+        WHEN 3 THEN TRUE
+        ELSE FALSE
+        END 
+    }
     with c
-    CALL () {
     MATCH (c)   
     WHERE c.alive = TRUE
     RETURN collect(c.id) as alive
-    }
-    RETURN alive AS alive""",
+    """,
         database_="neo4j",
     )
     lst = []
-    print("record",records[0])
+    lst+=records
+    print("record",records[0].data()['alive'],type(records))
+
     # for record in records:
     #     #lst+=record.data()['']
     #     print(record.data()['alive'])
-    print("backend",lst)
     return lst
