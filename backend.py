@@ -6,7 +6,7 @@ import json
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
-@app.route("/")
+@app.route("/getAliveCells")
 def get_alive_cells():
     records, summary, keys = driver.execute_query(
     
