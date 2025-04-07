@@ -39,5 +39,5 @@ with open('nodes.csv', 'w', newline='') as csvfile:
     writer.writeheader()
     for each in lst:
         new_dict = each
-        new_dict['alive'] = dead_or_alive()
+        new_dict['alive'] = 0
         writer.writerow(new_dict)
