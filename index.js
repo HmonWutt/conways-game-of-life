@@ -111,7 +111,6 @@ function sendRequest() {
       .then((data) => {
         console.log("data", data);
         bucket.textContent = data;
-        grid.forEach()
       })
       .catch((error) => {
         // ...handle/report error...
@@ -120,11 +119,12 @@ function sendRequest() {
 
 
 function loopThroughCellsAndTurnOnOrOff(aliveCells){
-  const grid = document.querySelectorAll(".cell");
-   grid.forEach((cell) => {
+  const cells = document.querySelectorAll(".cell");
+   cells.forEach((cell) => {
     alive = aliveCells.includes(cell.id)
     cell.classList.toggle("alive", alive);
-
+    grid[cell.id].alive = alive
    })
+   savedData = JSON.stringify(grid);
   
 }
