@@ -13,15 +13,8 @@ const simulationWindow = document.querySelector(".simulationWindow");
 
 let isRunning = false;
 let intervalId;
-/* let rows=10;
-let columns=10; */
-
-
 let grid = [];
 let savedData;
-/* rowButton.addEventListener("click", () => rows = parseInt(rowInput.value));
-colButton.addEventListener("click", () => columns = parseInt(colInput.value)); */
-
 function renderCells() {
   canvas.innerHTML = "";
   grid.forEach((cell) => {
@@ -55,12 +48,15 @@ runButton.addEventListener('pointerdown', () => {
           row: row,
           column: column,
           alive: false,
+          neighbours:[]
         });
         count++;
       }
     }
     canvas.style.gridTemplateColumns = `repeat(${columns}, var(--size))`;
     renderCells();
+    makeNeighbours(grid)
+    console.log("initial state",grid.forEach((cell)=>console.log(cell.neighbours)))
     const simulateGeneration = () => {
         const url = "http://127.0.0.1:5000/getAliveCells";
         fetch(url)
@@ -128,3 +124,18 @@ function loopThroughCellsAndTurnOnOrOff(aliveCells){
    savedData = JSON.stringify(grid);
   
 }
+
+function makeNeighbours(grid){
+    for (let cell = 0; cell < grid.length ; cell ++){
+      for (let neighbour = 0; neighbour < grid.length ; neighbour ++){
+          x_diff = Math.abs(grid[cell].row- grid[neighbour].row)%9
+          y_diff = Math.abs(grid[cell].column - grid[neighbour].column)%9
+          if (grid[cell].id == grid[neighbour].id) continue
+          else if (x_diff <=1 && y_diff <=1){
+              grid[cell].neighbours.push(grid[neighbour].id)
+        } 
+      }
+    }
+  }
+  
+    
