@@ -27,3 +27,24 @@ def get_alive_cells():
         database_="neo4j",
     )
     return records[0].data()['alive']
+
+createNodes = """
+summary = driver.execute_query(
+    "CREATE (:Cell {id: $id, alive: $alive, neighbours: $neighbours})
+    CALL(){
+    MATCH (c) 
+    UNWIND split(substring(c.neighbours,1,size(c.neighbours)-2),",") as n
+    WITH c,n
+    MATCH (c1:CELL{id: toInteger(n)}) 
+    CREATE (c)-[:NEIGHBOUR]->(c1)}",
+    id = each.id,
+    alive = each.alive,
+    neighbours = each.neighbours,
+    database_="neo4j",
+).summary
+print("Created {nodes_created} nodes in {time} ms.".format(
+    nodes_created=summary.counters.nodes_created,
+    time=summary.result_available_after
+))
+"""
+
