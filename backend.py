@@ -1,4 +1,4 @@
-from flask import Flask,render_template_string
+from flask import Flask,render_template_string,request
 from driver import driver
 from flask_cors import CORS
 import json
@@ -28,26 +28,28 @@ def get_alive_cells():
     )
     return records[0].data()['alive']
 
-@app.route("/createNodesAndRelationships")
+@app.route("/createNodesAndRelationships",methods=['POST'])
 def create_nodes_and_relationships():
-    grid = request.args.get(grid)
-    for each in grid:
-        summary = driver.execute_query(
-            """
-            CREATE (c:Cell {id: $id, alive: $alive, neighbours: $neighbours})
-            WITH c
-            UNWIND split(substring(c.neighbours,1,size(c.neighbours)-2),",") as n
-            CREATE (c)-[:NEIGHBOUR]->(c1{id: toInteger(n)})
-            WITH c
-            REMOVE c.neighbours
-            """,
-            id = each.id,
-            alive = each.alive,
-            neighbours = each.neighbours,
-            database_="neo4j",
-        ).summary
-        print("Created {nodes_created} nodes in {time} ms.".format(
-            nodes_created=summary.counters.nodes_created,
-            time=summary.result_available_after
-        ))
-    
+    if request.method == 'POST':
+        data = request.get_json()
+        grid = data.get('grid')
+        for each in grid:
+            summary = driver.execute_query(
+                """
+                CREATE (c:Cell {id: $id, alive: $alive, neighbours: $neighbours})
+                WITH c
+                UNWIND split(substring(c.neighbours,1,size(c.neighbours)-2),",") as n
+                CREATE (c)-[:NEIGHBOUR]->(c1{id: toInteger(n)})
+                WITH c
+                REMOVE c.neighbours
+                """,
+                id = each.id,
+                alive = each.alive,
+                neighbours = each.neighbours,
+                database_="neo4j",
+            ).summary
+            print("Created {nodes_created} nodes in {time} ms.".format(
+                nodes_created=summary.counters.nodes_created,
+                time=summary.result_available_after
+            ))
+        

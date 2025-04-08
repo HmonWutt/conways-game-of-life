@@ -32,3 +32,7 @@
 .is_running{
     pointer-events: none;
 }
+
+.hide{
+    display: none;
+}
