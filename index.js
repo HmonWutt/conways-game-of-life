@@ -15,24 +15,6 @@ let isRunning = false;
 let intervalId;
 let grid = [];
 let savedData;
-function renderCells() {
-  canvas.innerHTML = "";
-  grid.forEach((cell) => {
-    const cellNode = document.createElement("div");
-
-    cellNode.classList.add("cell");
-    cellNode.id = cell.id;
-    cellNode.classList.toggle("alive", cell.alive);
-
-    canvas.appendChild(cellNode);
-
-    if (isRunning) return;
-    cellNode.addEventListener("pointerdown", () => {
-      cell.alive = !cell.alive;
-      renderCells();
-    });
-  });
-}
 
 runButton.addEventListener('pointerdown', () => {
     isRunning = true;
@@ -95,24 +77,24 @@ resetButton.addEventListener('pointerdown', () => {
     renderCells()
 })
 
-function sendRequest() {
-    const url = "http://127.0.0.1:5000/getAliveCells"; 
-    fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error ${response.status}`);
-        }
-        return response.text(); 
-      })
-      .then((data) => {
-        console.log("data", data);
-        bucket.textContent = data;
-      })
-      .catch((error) => {
-        // ...handle/report error...
-      });
-}
+function renderCells() {
+  canvas.innerHTML = "";
+  grid.forEach((cell) => {
+    const cellNode = document.createElement("div");
 
+    cellNode.classList.add("cell");
+    cellNode.id = cell.id;
+    cellNode.classList.toggle("alive", cell.alive);
+
+    canvas.appendChild(cellNode);
+
+    if (isRunning) return;
+    cellNode.addEventListener("pointerdown", () => {
+      cell.alive = !cell.alive;
+      renderCells();
+    });
+  });
+}
 
 function loopThroughCellsAndTurnOnOrOff(aliveCells){
   const cells = document.querySelectorAll(".cell");
