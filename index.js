@@ -33,6 +33,7 @@ colButton.addEventListener('click',()=>{
         }
       }
       canvas.style.gridTemplateColumns = `repeat(${columns}, var(--size))`;
+      savedData = JSON.stringify(grid);
       renderCells();
       readyButton.classList.remove("hide");
       rowInput.classList.add("hide");
@@ -46,10 +47,10 @@ colButton.addEventListener('click',()=>{
 })
 readyButton.addEventListener('pointerdown', () => {
     makeNeighbours(grid)
-    console.log("initial state",grid.forEach((cell)=>console.log(cell.alive,cell.neighbours)))
-    //createNodesAndRelationships();
+    //grid.forEach((cell)=>console.log("initial",cell.alive,cell.neighbours))
+    createNodesAndRelationships(grid);
     readyButton.classList.add("hide");
-    runButton.classList.remove("hide");
+    
   })
 
 runButton.addEventListener('pointerdown', () => {
@@ -163,17 +164,25 @@ function simulateGeneration(){
           });
     }
 
-function createNodesAndRelationships(){
+function createNodesAndRelationships(grid){
+  body = []
+  grid.forEach((i)=>{
+    console.log("each",i)
+    let neighbours = i.neighbours.map((j) => String(j)).join(",");
+    newi = {'id':i.id, 'alive':i.alive, 'neighbours': neighbours}
+    body.push(newi)
+  })
+  console.log("body",body)
   fetch("http://127.0.0.1:5000/createNodesAndRelationships", {
     method: "POST",
     body: JSON.stringify({
-      "grid": grid
+      "grid": body
     }),
     headers: {
       "Content-type": "application/json; charset=UTF-8",
     },
   })
     .then((response) => response.json())
-    .then((json) => console.log(json));
+    .then((json) => {console.log(json);runButton.classList.remove("hide");});
 
 }

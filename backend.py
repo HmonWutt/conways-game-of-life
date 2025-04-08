@@ -34,22 +34,52 @@ def create_nodes_and_relationships():
         data = request.get_json()
         grid = data.get('grid')
         for each in grid:
-            summary = driver.execute_query(
-                """
-                CREATE (c:Cell {id: $id, alive: $alive, neighbours: $neighbours})
-                WITH c
-                UNWIND split(substring(c.neighbours,1,size(c.neighbours)-2),",") as n
-                CREATE (c)-[:NEIGHBOUR]->(c1{id: toInteger(n)})
-                WITH c
-                REMOVE c.neighbours
-                """,
-                id = each.id,
-                alive = each.alive,
-                neighbours = each.neighbours,
-                database_="neo4j",
-            ).summary
-            print("Created {nodes_created} nodes in {time} ms.".format(
-                nodes_created=summary.counters.nodes_created,
-                time=summary.result_available_after
-            ))
-        
+            records,summary, keys = driver.execute_query(
+                # """WITH $grid AS grid
+                # FOREACH(cell IN grid | CREATE (c:Cell {id: cell.id, alive: cell.alive, neighbours: cell.neighbours}))""", 
+                # grid = grid,
+                # database_="neo4j",
+                # ).summary
+         """
+            CREATE (c:Cell {id: $id, alive: $alive, neighbours: $neighbours})
+            WITH c
+            UNWIND split(c.neighbours, ",") AS n
+            MATCH (c1:Cell {id: toInteger(n)})
+            CREATE (c)-[:NEIGHBOUR]->(c1)
+            REMOVE c.neighbours
+            """,
+            id = each['id'],
+            alive = each['alive'],
+        neighbours = each['neighbours'],
+        database_="neo4j"
+            )
+        driver
+        return records
+"""  WITH c
+            Call()
+            {
+            MATCH (c)
+            UNWIND split(substring(c.neighbours,0,size(c.neighbours)),",") as n
+            WITH c,n
+            MATCH (c1:CELL{id: toInteger(n)}) 
+            CREATE (c)-[:NEIGHBOUR]->(c1)}
+            WITH c
+            REMOVE c.neighbours"""
+
+
+    #old_create = """
+    #                 CREATE (c:Cell {id: $id, alive: $alive, neighbours: $neighbours})
+    #                 WITH c
+    #                 UNWIND split(substring(c.neighbours,1,size(c.neighbours)-2),",") as n
+    #                 CREATE (c)-[:NEIGHBOUR]->(c1{id: toInteger(n)})
+    #                 WITH c
+    #                 REMOVE c.neighbours
+    #                 """,
+    #                 id = each['id'],
+    #                 alive = each['alive'],
+#                 neighbours = ",".join([str(i) for i in each['neighbours']]),
+#                 database_="neo4j", 
+#   """
+# """WITH $grid AS document
+# UNWIND grid
+# FOREACH(cell IN grid | CREATE (c:Cell {id: cell.id, alive: cell.alive, neighbours: cell.neighbours}))""", grid = grid
