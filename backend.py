@@ -28,23 +28,26 @@ def get_alive_cells():
     )
     return records[0].data()['alive']
 
-createNodes = """
-summary = driver.execute_query(
-    "CREATE (:Cell {id: $id, alive: $alive, neighbours: $neighbours})
-    CALL(){
-    MATCH (c) 
-    UNWIND split(substring(c.neighbours,1,size(c.neighbours)-2),",") as n
-    WITH c,n
-    MATCH (c1:CELL{id: toInteger(n)}) 
-    CREATE (c)-[:NEIGHBOUR]->(c1)}",
-    id = each.id,
-    alive = each.alive,
-    neighbours = each.neighbours,
-    database_="neo4j",
-).summary
-print("Created {nodes_created} nodes in {time} ms.".format(
-    nodes_created=summary.counters.nodes_created,
-    time=summary.result_available_after
-))
-"""
-
+@app.route("/createNodesAndRelationships")
+def create_nodes_and_relationships():
+    grid = request.args.get(grid)
+    for each in grid:
+        summary = driver.execute_query(
+            """
+            CREATE (c:Cell {id: $id, alive: $alive, neighbours: $neighbours})
+            WITH c
+            UNWIND split(substring(c.neighbours,1,size(c.neighbours)-2),",") as n
+            CREATE (c)-[:NEIGHBOUR]->(c1{id: toInteger(n)})
+            WITH c
+            REMOVE c.neighbours
+            """,
+            id = each.id,
+            alive = each.alive,
+            neighbours = each.neighbours,
+            database_="neo4j",
+        ).summary
+        print("Created {nodes_created} nodes in {time} ms.".format(
+            nodes_created=summary.counters.nodes_created,
+            time=summary.result_available_after
+        ))
+    
