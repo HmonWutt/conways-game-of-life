@@ -76,6 +76,7 @@ stopButton.addEventListener('pointerdown', () => {
 resetButton.addEventListener('pointerdown', () => {
     grid.map(o => o.alive = false);
     renderCells()
+    killAll()
     rowInput.classList.remove("hide");
     colInput.classList.remove("hide")
     duration.classList.remove("hide");
@@ -88,6 +89,7 @@ resetButton.addEventListener('pointerdown', () => {
     runButton.classList.add("hide")
     stopButton.classList.add("hide");
     resetButton.classList.add("hide");
+
 })
 
 function renderCells() {
@@ -144,25 +146,51 @@ function makeNeighbours(grid){
     }
   }
   
+function killAll() {
+  const url = "http://127.0.0.1:5000/killAll";
+  fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+      return response.text();
+    })
+    .then((data) => {
+      console.log("data", data);
+      //bucket.textContent = data;
+    
+    })
+    .catch((error) => {
+      // ...handle/report error...
+    });
+}
+
 function simulateGeneration(){
-        const url = "http://127.0.0.1:5000/getAliveCells";
-        fetch(url)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`HTTP error ${response.status}`);
-            }
-            return response.text();
-          })
-          .then((data) => {
-            console.log("data", data);
-            //bucket.textContent = data;
-            loopThroughCellsAndTurnOnOrOff(data)
-            
-          })
-          .catch((error) => {
-            // ...handle/report error...
-          });
-    }
+  const url = "http://127.0.0.1:5000/getAliveCells";
+  fetch(url, {
+    method: "POST",
+    body: JSON.stringify({
+      limit: grid.length
+    }),
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+      return response.text();
+    })
+    .then((data) => {
+      console.log("data", data);
+      //bucket.textContent = data;
+      loopThroughCellsAndTurnOnOrOff(data);
+    })
+    .catch((error) => {
+      // ...handle/report error...
+    });
+}
 
 function createNodesAndRelationships(grid){
   body = []
@@ -173,7 +201,7 @@ function createNodesAndRelationships(grid){
     body.push(newi)
   })
   console.log("body",body)
-  fetch("http://127.0.0.1:5000/createNodesAndRelationships", {
+  fetch("http://127.0.0.1:5000/createRelationships", {
     method: "POST",
     body: JSON.stringify({
       "grid": body
