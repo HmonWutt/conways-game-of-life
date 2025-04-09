@@ -119,11 +119,10 @@ function pickAliveCells(){
 renderCells();
 }
 function loopThroughCellsAndTurnOnOrOff(aliveCells){
-
    grid.forEach((cell) => {
-    alive = aliveCells.includes(cell.id)
-    grid[cell.id].alive = alive
-   })
+    life = aliveCells.includes(cell.id)
+     cell.alive = life
+    })
    savedData = JSON.stringify(grid);
   
 }
@@ -151,9 +150,11 @@ function simulateGeneration(){
             return response.text();
           })
           .then((data) => {
-            console.log("data", data);
-            //bucket.textContent = data;
-            loopThroughCellsAndTurnOnOrOff(data)
+  
+            data = data.substring(1,data.length-2).split(",")
+            newData = []
+            data.forEach((d)=>newData.push(parseInt(d)))
+            loopThroughCellsAndTurnOnOrOff(newData)
             renderCells();
             
           })
@@ -165,12 +166,10 @@ function simulateGeneration(){
 function createNodesAndRelationships(grid){
   body = []
   grid.forEach((i)=>{
-    console.log("each",i)
     let neighbours = i.neighbours.map((j) => String(j)).join(",");
     newi = {'id':i.id, 'alive':i.alive, 'neighbours': neighbours}
     body.push(newi)
   })
-  console.log("body",body)
   fetch("http://127.0.0.1:5000/createNodesAndRelationships", {
     method: "POST",
     body: JSON.stringify({
