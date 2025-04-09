@@ -180,6 +180,6 @@ function createNodesAndRelationships(grid){
     },
   })
     .then((response) => response.json())
-    .then((json) => {console.log(json);runButton.classList.remove("hide");});
+    .then((json) => {runButton.classList.remove("hide");});
 
 }
