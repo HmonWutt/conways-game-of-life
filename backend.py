@@ -85,8 +85,9 @@ def giveLife():
     if request.method == "POST":
         data= request.get_json()
         alive = data["alive"]
-    records, summary, keys = driver.execute_query(
+        records, summary, keys = driver.execute_query(
         """WITH $alive AS alive
         FOREACH(cell IN alive| SET cell.alive = TRUE)
-        """, database_="neo4j"
-)
+        """, database_="neo4j")
+        return records
+
