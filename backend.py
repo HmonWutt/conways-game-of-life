@@ -9,20 +9,19 @@ CORS(app, supports_credentials=True)
 @app.route("/getAliveCells")
 def get_alive_cells():
     records, summary, keys = driver.execute_query(
-    
     """MATCH (c)-[:NEIGHBOUR]->(q{alive:TRUE})
     with c, size(collect(q)) as neighbours
     CALL (*) {
     SET c.alive = 
-        CASE neighbours
-        WHEN 2 THEN TRUE
-        WHEN 3 THEN TRUE
+        CASE 
+        WHEN neighbours = 2 AND c.alive=TRUE THEN TRUE
+        WHEN neighbours = 3 THEN TRUE
         ELSE FALSE
         END 
     }
-    MATCH (c)   
-    WHERE c.alive = TRUE
-    RETURN collect(c.id) as alive
+    MATCH (d)   
+    WHERE d.alive = TRUE
+    RETURN collect(distinct d.id) as alive
     """,
         database_="neo4j",
     )
@@ -45,8 +44,9 @@ def create_nodes_and_relationships():
             WITH c
             UNWIND split(c.neighbours, ",") AS n
             MATCH (c1:Cell {id: toInteger(n)})
-            CREATE (c)-[:NEIGHBOUR]->(c1)
-            REMOVE c.neighbours
+            CREATE (c)-[:NEIGHBOUR]->(c1)-[:NEIGHBOUR]->(c)
+            with c,c1
+            REMOVE c.neighbours,c1.neighbours
             """,
             id = each['id'],
             alive = each['alive'],
@@ -55,7 +55,7 @@ def create_nodes_and_relationships():
             )
         driver
         return records
-"""  WITH c
+query = """  WITH c
             Call()
             {
             MATCH (c)
@@ -83,3 +83,17 @@ def create_nodes_and_relationships():
 # """WITH $grid AS document
 # UNWIND grid
 # FOREACH(cell IN grid | CREATE (c:Cell {id: cell.id, alive: cell.alive, neighbours: cell.neighbours}))""", grid = grid
+
+kill_revive_cells_query = """MATCH (c)-[:NEIGHBOUR]->(q{alive:TRUE})
+    with c, size(collect(q)) as neighbours
+    CALL (*) {
+    SET c.alive = 
+        CASE neighbours
+        WHEN 2 THEN TRUE
+        WHEN 3 THEN TRUE
+        ELSE FALSE
+        END 
+    }
+    MATCH (c)   
+    WHERE c.alive = TRUE
+    RETURN collect(c.id) as alive"""

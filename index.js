@@ -56,8 +56,6 @@ readyButton.addEventListener('pointerdown', () => {
 runButton.addEventListener('pointerdown', () => {
    isRunning = true;
    canvas.classList.add("isRunning");
-   savedData = JSON.stringify(grid);
-    simulateGeneration()
     const time = parseInt(duration.value) || 1500
     intervalId = setInterval(simulateGeneration, time)
     stopButton.classList.remove("hide");
@@ -121,10 +119,9 @@ function pickAliveCells(){
 renderCells();
 }
 function loopThroughCellsAndTurnOnOrOff(aliveCells){
-  const cells = document.querySelectorAll(".cell");
-   cells.forEach((cell) => {
+
+   grid.forEach((cell) => {
     alive = aliveCells.includes(cell.id)
-    cell.classList.toggle("alive", alive);
     grid[cell.id].alive = alive
    })
    savedData = JSON.stringify(grid);
@@ -157,6 +154,7 @@ function simulateGeneration(){
             console.log("data", data);
             //bucket.textContent = data;
             loopThroughCellsAndTurnOnOrOff(data)
+            renderCells();
             
           })
           .catch((error) => {
