@@ -6,24 +6,22 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 @app.route("/getAliveCells")
 def get_alive_cells():
-    records = driver.execute_query(
+    driver.execute_query(
     """
-    MATCH (c)-[:NEIGHBOUR]->(q{alive:TRUE})
-    with c, size(collect(q)) as neighbours
-    CALL (*) {
-    SET c.alive = 
-        CASE 
-        WHEN neighbours = 2 AND c.alive=TRUE THEN TRUE
-        WHEN neighbours = 3 THEN TRUE
-        ELSE FALSE
-        END 
-    }
-    MATCH (d)   
-    WHERE d.alive = TRUE
-    RETURN collect(distinct d.id) as alive
+    MATCH (c:Cell)
+    with c,
+    CASE 
+    WHEN count{(c)-[:NEIGHBOUR]->(q{alive:TRUE})}=2 AND c.alive=TRUE THEN TRUE
+    WHEN count{(c)-[:NEIGHBOUR]->(q{alive:TRUE})} = 3 THEN TRUE
+    ELSE FALSE
+    END as life
+    SET c.alive = life
     """,
         database_="neo4j",
-    ).records
+    )
+    records = driver.execute_query(
+    """MATCH (d{alive:TRUE})   
+    RETURN collect(distinct d.id) as alive""").records
     return records[0].data()['alive']
 
 
@@ -54,3 +52,13 @@ def create_nodes_and_relationships():
         time=summary.result_available_after
         ))
         return records
+
+@app.route("/reset")
+def reset():
+    driver.execute_query(
+    """
+    MATCH (c)
+    DETACH DELETE c
+    """,
+    database_="neo4j")
+    return "OK"

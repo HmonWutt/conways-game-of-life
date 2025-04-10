@@ -56,7 +56,7 @@ readyButton.addEventListener('pointerdown', () => {
 runButton.addEventListener('pointerdown', () => {
    isRunning = true;
    canvas.classList.add("isRunning");
-    const time = parseInt(duration.value) || 1500
+    const time = parseInt(duration.value) || 800
     intervalId = setInterval(simulateGeneration, time)
     stopButton.classList.remove("hide");
     resetButton.classList.remove("hide");
@@ -72,20 +72,7 @@ stopButton.addEventListener('pointerdown', () => {
 })
 
 resetButton.addEventListener('pointerdown', () => {
-    grid.map(o => o.alive = false);
-    renderCells()
-    rowInput.classList.remove("hide");
-    colInput.classList.remove("hide")
-    duration.classList.remove("hide");
-    rowButton.classList.remove("hide");
-    colButton.classList.remove("hide");
-    durationButton.classList.remove("hide");
-    rowButton.classList.remove("hide");
-    colButton.classList.remove("hide");
-    readyButton.classList.add("hide")
-    runButton.classList.add("hide")
-    stopButton.classList.add("hide");
-    resetButton.classList.add("hide");
+    reset()
 })
 
 function renderCells() {
@@ -128,10 +115,12 @@ function loopThroughCellsAndTurnOnOrOff(aliveCells){
 }
 
 function makeNeighbours(grid){
+    modulus_num = Math.sqrt(grid.length)-1
+    console.log(modulus_num)
     for (let cell = 0; cell < grid.length ; cell ++){
       for (let neighbour = 0; neighbour < grid.length ; neighbour ++){
-          x_diff = Math.abs(grid[cell].row- grid[neighbour].row)%9
-          y_diff = Math.abs(grid[cell].column - grid[neighbour].column)%9
+          let x_diff =Math.abs(grid[cell].row - grid[neighbour].row) % modulus_num
+          let y_diff = (Math.abs(grid[cell].column - grid[neighbour].column))%modulus_num
           if (grid[cell].id == grid[neighbour].id) continue
           else if (x_diff <=1 && y_diff <=1){
               grid[cell].neighbours.push(grid[neighbour].id)
@@ -181,5 +170,26 @@ function createNodesAndRelationships(grid){
   })
     .then((response) => response.json())
     .then((json) => {runButton.classList.remove("hide");});
+
+}
+
+function reset(){
+  fetch("http://127.0.0.1:5000/reset")
+    .then((response) => {
+      grid.map((o) => (o.alive = false));
+      renderCells();
+      rowInput.classList.remove("hide");
+      colInput.classList.remove("hide");
+      duration.classList.remove("hide");
+      rowButton.classList.remove("hide");
+      colButton.classList.remove("hide");
+      durationButton.classList.remove("hide");
+      rowButton.classList.remove("hide");
+      colButton.classList.remove("hide");
+      readyButton.classList.add("hide");
+      runButton.classList.add("hide");
+      stopButton.classList.add("hide");
+      resetButton.classList.add("hide");
+  })
 
 }
