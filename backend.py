@@ -1,14 +1,12 @@
 from flask import Flask,render_template_string,request
 from driver import driver
 from flask_cors import CORS
-import json
-
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 @app.route("/getAliveCells")
 def get_alive_cells():
-    records, summary, keys = driver.execute_query(
+    records = driver.execute_query(
     """
     MATCH (c)-[:NEIGHBOUR]->(q{alive:TRUE})
     with c, size(collect(q)) as neighbours
@@ -25,7 +23,7 @@ def get_alive_cells():
     RETURN collect(distinct d.id) as alive
     """,
         database_="neo4j",
-    )
+    ).records
     return records[0].data()['alive']
 
 
@@ -50,4 +48,9 @@ def create_nodes_and_relationships():
         neighbours = each['neighbours'],
         database_="neo4j"
             )
+        print("Created {nodes_created} nodes and {rels_created} relationships in {time} ms.".format(
+        nodes_created=summary.counters.nodes_created,
+        rels_created = summary.counters.relationships_created,
+        time=summary.result_available_after
+        ))
         return records
