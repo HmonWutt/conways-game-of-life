@@ -18,8 +18,8 @@ let grid = [];
 let savedData;
 colButton.addEventListener('click',()=>{
       let count = 0;
-      rows = rowInput.value;
-      columns = colInput.value;
+      let rows = rowInput.value;
+      let columns = colInput.value;
       for (let row = 0; row < rows; row++) {
         for (let column = 0; column < columns; column++) {
           grid.push({
@@ -115,7 +115,7 @@ function loopThroughCellsAndTurnOnOrOff(aliveCells){
 }
 
 function makeNeighbours(grid){
-    modulus_num = Math.sqrt(grid.length)-1
+    let modulus_num = Math.sqrt(grid.length)-1
     console.log(modulus_num)
     for (let cell = 0; cell < grid.length ; cell ++){
       for (let neighbour = 0; neighbour < grid.length ; neighbour ++){
@@ -141,7 +141,7 @@ function simulateGeneration(){
           .then((data) => {
   
             data = data.substring(1,data.length-2).split(",")
-            newData = []
+            let newData = []
             data.forEach((d)=>newData.push(parseInt(d)))
             loopThroughCellsAndTurnOnOrOff(newData)
             renderCells();
@@ -153,7 +153,7 @@ function simulateGeneration(){
     }
 
 function createNodesAndRelationships(grid){
-  body = []
+  let body = []
   grid.forEach((i)=>{
     let neighbours = i.neighbours.map((j) => String(j)).join(",");
     newi = {'id':i.id, 'alive':i.alive, 'neighbours': neighbours}
@@ -178,6 +178,7 @@ function reset(){
     .then((response) => {
       grid.map((o) => (o.alive = false));
       renderCells();
+      canvas.innerHTML = "";
       rowInput.classList.remove("hide");
       colInput.classList.remove("hide");
       duration.classList.remove("hide");
