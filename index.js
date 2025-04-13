@@ -46,9 +46,9 @@ colButton.addEventListener('click',()=>{
       colButton.classList.add("hide");
 })
 readyButton.addEventListener('pointerdown', () => {
-    makeNeighbours(grid)
-    //grid.forEach((cell)=>console.log("initial",cell.alive,cell.neighbours))
-    createNodesAndRelationships(grid);
+    //makeNeighbours(grid)
+    //createNodesAndRelationships(grid);
+    sendAliveCells(grid);
     readyButton.classList.add("hide");
     
   })
@@ -72,7 +72,9 @@ stopButton.addEventListener('pointerdown', () => {
 })
 
 resetButton.addEventListener('pointerdown', () => {
-    reset()
+    //reset()
+    altReset()
+   
 })
 
 function renderCells() {
@@ -93,18 +95,26 @@ function renderCells() {
   });
 }
 
-function pickAliveCells(){
+function markAliveCells(){
+  canvas.innerHTML = "";
+  grid.forEach((cell) => {
+    const cellNode = document.createElement("div");
+    cellNode.classList.add("cell");
+    cellNode.id = cell.id;
+    cellNode.classList.toggle("alive", cell.alive);
+
+    canvas.appendChild(cellNode);})
   if (isRunning) return;
-  grid.forEach((cell)=>{
-    const cellNode = document.querySelector("#cell.id")
     cellNode.addEventListener("pointerdown", () => {
     cell.alive = !cell.alive;
     cellNode.classList.toggle("alive", cell.alive);
+    markAliveCells()
     
   });
-})
-renderCells();
+
 }
+
+
 function loopThroughCellsAndTurnOnOrOff(aliveCells){
    grid.forEach((cell) => {
     life = aliveCells.includes(cell.id)
@@ -172,12 +182,27 @@ function createNodesAndRelationships(grid){
     .then((json) => {runButton.classList.remove("hide");});
 
 }
-
+function sendAliveCells(grid){
+  let body=[]
+  grid.forEach((i) => {
+   if (i.alive) body.push(i.id)
+  });
+  fetch("http://127.0.0.1:5000/sendAliveCells",{
+    method:"POST",
+    body : JSON.stringify({
+      "grid": body
+    }),
+    headers:{
+      "Content-type": "application/json; charset=UTF-8"
+    },
+  }).then((response)=>
+   
+      runButton.classList.remove("hide"))
+}
 function reset(){
   fetch("http://127.0.0.1:5000/reset")
     .then((response) => {
-      grid.map((o) => (o.alive = false));
-      renderCells();
+      grid=[]
       canvas.innerHTML = "";
       rowInput.classList.remove("hide");
       colInput.classList.remove("hide");
@@ -193,4 +218,22 @@ function reset(){
       resetButton.classList.add("hide");
   })
 
+}
+function altReset() {
+  fetch("http://127.0.0.1:5000/altReset").then((response) => {
+    grid=[]
+    canvas.innerHTML = "";
+    rowInput.classList.remove("hide");
+    colInput.classList.remove("hide");
+    duration.classList.remove("hide");
+    rowButton.classList.remove("hide");
+    colButton.classList.remove("hide");
+    durationButton.classList.remove("hide");
+    rowButton.classList.remove("hide");
+    colButton.classList.remove("hide");
+    readyButton.classList.add("hide");
+    runButton.classList.add("hide");
+    stopButton.classList.add("hide");
+    resetButton.classList.add("hide");
+  });
 }

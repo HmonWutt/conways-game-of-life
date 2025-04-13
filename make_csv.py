@@ -14,8 +14,8 @@ def make_neighbours(dict):
     for i in dict:
         adjacency_list = []
         for neighbour in dict: 
-            x_diff = abs(i['x']- neighbour['x'])%9
-            y_diff = abs(i['y'] - neighbour['y'])%9
+            x_diff = abs(i['x']- neighbour['x'])%(number_of_cells-1)
+            y_diff = abs(i['y'] - neighbour['y'])%(number_of_cells-1)
             if i['id']==neighbour['id']: 
                 print(i['id'],neighbour['id'])
                 continue

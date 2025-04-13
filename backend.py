@@ -1,6 +1,7 @@
-from flask import Flask,render_template_string,request
-from driver import driver
+from flask import Flask,request
 from flask_cors import CORS
+from driver import driver
+
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -62,3 +63,28 @@ def reset():
     """,
     database_="neo4j")
     return "OK"
+
+@app.route("/altReset")
+def alt_reset():
+    driver.execute_query(
+    """
+    MATCH (c)
+    SET c.alive = FALSE
+    """,
+    database_="neo4j")
+    return "OK"
+@app.route("/sendAliveCells",methods=["POST"])
+def send_alive_cells():
+    data = request.get_json()
+
+    grid = data.get('grid')
+    print(grid)
+    driver.execute_query("""
+    WITH $grid as aliveCells
+    MATCH (c)
+    WHERE c.id IN aliveCells   
+    SET c.alive = TRUE
+    """,
+    grid = grid,
+    database_="neo4j")
+    return "ok"

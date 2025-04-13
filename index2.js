@@ -6,8 +6,8 @@ let isRunning = false;
 let intervalId;
 let grid = [];
 let savedData;
-const rows = 10;
-const columns = 10;
+const rows = 20;
+const columns = 20;
 
 runButton.addEventListener("pointerdown", () => {
   isRunning = true;
@@ -30,8 +30,6 @@ runButton.addEventListener("pointerdown", () => {
   canvas.classList.add("isRunning");
   const time =  800;
   intervalId = setInterval(simulateGeneration, time);
-  stopButton.classList.remove("hide");
-  resetButton.classList.remove("hide");
 });
 
 stopButton.addEventListener("pointerdown", () => {
@@ -67,8 +65,9 @@ function renderCells() {
 
 function loopThroughCellsAndTurnOnOrOff(aliveCells) {
   grid.forEach((cell) => {
-    life = aliveCells.includes(cell.id);
+   let life = aliveCells.includes(cell.id);
     cell.alive = life;
+
   });
   savedData = JSON.stringify(grid);
 }
@@ -84,7 +83,7 @@ function simulateGeneration() {
     })
     .then((data) => {
       data = data.substring(1, data.length - 2).split(",");
-      newData = [];
+      let newData = [];
       data.forEach((d) => newData.push(parseInt(d)));
       loopThroughCellsAndTurnOnOrOff(newData);
       renderCells();
