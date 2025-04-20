@@ -4,12 +4,12 @@ const readyButton = document.querySelector("#ready");
 const runButton = document.querySelector("#run");
 const stopButton = document.querySelector("#stop");
 const resetButton = document.querySelector("#reset");
-const duration = document.querySelector("#duration");
+const speed = document.querySelector("#speed");
 const rowInput = document.querySelector("#rows");
 const colInput = document.querySelector("#cols");
 const rowButton = document.querySelector("#rowButton");
 const colButton = document.querySelector("#colButton");
-const durationButton = document.querySelector("#durationButton");
+const speedButton = document.querySelector("#speedButton");
 const simulationWindow = document.querySelector(".simulationWindow");
 
 let isRunning = false;
@@ -38,10 +38,10 @@ colButton.addEventListener('click',()=>{
       readyButton.classList.remove("hide");
       rowInput.classList.add("hide");
       colInput.classList.add("hide");
-      duration.classList.add("hide");
+      speed.classList.add("hide");
       rowButton.classList.add("hide");
       colButton.classList.add("hide");
-      durationButton.classList.add("hide");
+      speedButton.classList.add("hide");
       rowButton.classList.add("hide");
       colButton.classList.add("hide");
 })
@@ -56,7 +56,7 @@ readyButton.addEventListener('pointerdown', () => {
 runButton.addEventListener('pointerdown', () => {
    isRunning = true;
    canvas.classList.add("isRunning");
-    const time = parseInt(duration.value) || 800
+    const time = parseInt(speed.value) || 800
     intervalId = setInterval(simulateGeneration, time)
     stopButton.classList.remove("hide");
     resetButton.classList.remove("hide");
@@ -73,7 +73,7 @@ stopButton.addEventListener('pointerdown', () => {
 
 resetButton.addEventListener('pointerdown', () => {
     //reset()
-    altReset()
+   altReset()
    
 })
 
@@ -206,10 +206,10 @@ function reset(){
       canvas.innerHTML = "";
       rowInput.classList.remove("hide");
       colInput.classList.remove("hide");
-      duration.classList.remove("hide");
+      speed.classList.remove("hide");
       rowButton.classList.remove("hide");
       colButton.classList.remove("hide");
-      durationButton.classList.remove("hide");
+      speedButton.classList.remove("hide");
       rowButton.classList.remove("hide");
       colButton.classList.remove("hide");
       readyButton.classList.add("hide");
@@ -225,10 +225,10 @@ function altReset() {
     canvas.innerHTML = "";
     rowInput.classList.remove("hide");
     colInput.classList.remove("hide");
-    duration.classList.remove("hide");
+    speed.classList.remove("hide");
     rowButton.classList.remove("hide");
     colButton.classList.remove("hide");
-    durationButton.classList.remove("hide");
+    speedButton.classList.remove("hide");
     rowButton.classList.remove("hide");
     colButton.classList.remove("hide");
     readyButton.classList.add("hide");
